@@ -1,4 +1,4 @@
-package info.benjaminhill.plugins
+package info.benjaminhill.candybot.plugins
 
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*

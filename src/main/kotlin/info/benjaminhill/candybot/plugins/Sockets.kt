@@ -1,4 +1,4 @@
-package info.benjaminhill.plugins
+package info.benjaminhill.candybot.plugins
 
 import io.ktor.server.application.*
 import io.ktor.server.routing.*

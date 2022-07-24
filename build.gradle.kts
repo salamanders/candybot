@@ -19,6 +19,7 @@ application {
 
 repositories {
     mavenCentral()
+    maven { setUrl("https://jitpack.io") }
 }
 
 dependencies {
@@ -30,6 +31,7 @@ dependencies {
     implementation("io.ktor:ktor-server-websockets-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-cio-jvm:$ktorVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
-    testImplementation("io.ktor:ktor-server-tests-jvm:$ktorVersion")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
+
+    implementation("com.github.jaakkos:ev3dev-lang-java:a379a53500")
+
 }
