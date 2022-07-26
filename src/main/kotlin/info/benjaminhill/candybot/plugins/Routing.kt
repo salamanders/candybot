@@ -13,7 +13,7 @@ fun Application.configureRouting() {
             call.respondText("Hello World!")
         }
         get("/go") {
-            call.respondText("Going!")
+            call.respondText("Going Medium!")
             runMotorA()
         }
         // Static plugin. Try to access `/static/index.html`

@@ -1,6 +1,7 @@
 package info.benjaminhill.candybot
 
 import ev3dev.actuators.lego.motors.EV3LargeRegulatedMotor
+import ev3dev.actuators.lego.motors.EV3MediumRegulatedMotor
 import info.benjaminhill.candybot.plugins.configureRouting
 import info.benjaminhill.candybot.plugins.configureSecurity
 import info.benjaminhill.candybot.plugins.configureSerialization
@@ -17,12 +18,11 @@ fun main() {
         configureSockets()
         configureRouting()
     }.start(wait = true)
-
 }
 
-
 suspend fun runMotorA() {
-    val mA = EV3LargeRegulatedMotor(MotorPort.A)
+    println("runMotorA")
+    val mA = EV3MediumRegulatedMotor(MotorPort.A)
     mA.speed = 500
     mA.brake()
     mA.forward()

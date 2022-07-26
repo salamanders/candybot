@@ -11,7 +11,7 @@ plugins {
 group = "info.benjaminhill"
 version = "0.0.1"
 application {
-    mainClass.set("info.benjaminhill.ApplicationKt")
+    mainClass.set("info.benjaminhill.candybot.ApplicationKt")
 
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
