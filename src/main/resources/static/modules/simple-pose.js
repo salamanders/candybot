@@ -69,10 +69,13 @@ async function estimatePoses() {
             videoOutCtx.fillText(name, x, y);
             console.log(`(${Math.round(x)}, ${Math.round(y)}) ${name} = ${Math.round((score + Number.EPSILON) * 100) / 100}`);
         });
-        sendToServer(JSON.stringify(poses[0].keypoints));
+        sendToServer(JSON.stringify(poses[0].keypoints, (key, val) => {
+            return val.toFixed ? Number(val.toFixed(0)) : val;
+        }));
         const endMs = performance.now();
         const timeToWait = 250 - (endMs - startMs);
         if (timeToWait > 0) {
+            console.debug(`Slowing things down by ${timeToWait}ms`)
             await timer(timeToWait);
         }
     }

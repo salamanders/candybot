@@ -1,3 +1,6 @@
+https://letsencrypt.org/docs/certificates-for-localhost/
+https://support.google.com/pixelphone/answer/2844832?hl=en
+
 <label>
     <input type="range" min="-100" max="100" step="1.0">
 </label>

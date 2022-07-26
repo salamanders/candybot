@@ -9,7 +9,7 @@ import java.time.Duration
 fun Application.configureSockets() {
     install(WebSockets) {
         pingPeriod = Duration.ofSeconds(15)
-        timeout = Duration.ofSeconds(15)
+        timeout = Duration.ofSeconds(30)
         maxFrameSize = Long.MAX_VALUE
         masking = false
     }
@@ -19,7 +19,7 @@ fun Application.configureSockets() {
             for (frame in incoming) {
                 if (frame is Frame.Text) {
                     val text = frame.readText()
-                    outgoing.send(Frame.Text("YOU SAID: $text"))
+                    outgoing.send(Frame.Text("ACK ${text.length}"))
                     if (text.equals("bye", ignoreCase = true)) {
                         close(CloseReason(CloseReason.Codes.NORMAL, "Client said BYE"))
                     }

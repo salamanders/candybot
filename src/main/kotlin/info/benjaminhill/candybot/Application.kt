@@ -3,7 +3,6 @@ package info.benjaminhill.candybot
 import ev3dev.actuators.lego.motors.EV3LargeRegulatedMotor
 import ev3dev.actuators.lego.motors.EV3MediumRegulatedMotor
 import info.benjaminhill.candybot.plugins.configureRouting
-import info.benjaminhill.candybot.plugins.configureSecurity
 import info.benjaminhill.candybot.plugins.configureSerialization
 import info.benjaminhill.candybot.plugins.configureSockets
 import io.ktor.server.cio.*
@@ -13,7 +12,6 @@ import lejos.hardware.port.MotorPort
 
 fun main() {
     embeddedServer(CIO, port = 8080, host = "0.0.0.0") {
-        configureSecurity()
         configureSerialization()
         configureSockets()
         configureRouting()
