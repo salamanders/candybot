@@ -1,6 +1,36 @@
 https://letsencrypt.org/docs/certificates-for-localhost/
 https://support.google.com/pixelphone/answer/2844832?hl=en
 
+
+keytool -keystore keystore.jks -alias ev3dev -genkeypair -keyalg RSA -keysize 4096 -validity 90 -dname 'CN=ev3dev, OU=ktor, O=ktor, L=Unspecified, ST=Unspecified, C=US'
+pw: "changeit"
+
+/usr/bin/keytool
+package info.benjaminhill.candybot.plugins
+
+import io.ktor.server.application.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import io.ktor.server.sessions.*
+import kotlin.collections.set
+
+fun Application.configureSecurity() {
+    data class MySession(val count: Int = 0)
+    install(Sessions) {
+        cookie<MySession>("MY_SESSION") {
+            cookie.extensions["SameSite"] = "lax"
+        }
+    }
+
+    routing {
+        get("/session/increment") {
+            val session = call.sessions.get() ?: MySession()
+            call.sessions.set(session.copy(count = session.count + 1))
+            call.respondText("Counter is ${session.count}. Refresh to increment.")
+        }
+    }
+}
+
 <label>
     <input type="range" min="-100" max="100" step="1.0">
 </label>

@@ -1,7 +1,6 @@
 /*jshint esversion: 8 */
 
-import { startPoseRecognition, openServerCommunication } from '/modules/simple-pose.js';
+import {SimplePose} from '/modules/simple-pose.js';
 
-openServerCommunication();
-
-await startPoseRecognition();
+const sp = new SimplePose();
+await sp.run();
