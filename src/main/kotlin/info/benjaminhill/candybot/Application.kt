@@ -18,12 +18,13 @@ import java.io.File
 import java.time.Duration
 
 fun main() {
+    val dummyPassword = "changeit";
     val keyStoreFile = File("src/main/resources/keystore.jks")
     val keystore = generateCertificate(
         file = keyStoreFile,
         keyAlias = "ev3dev",
-        keyPassword = "changeit",
-        jksPassword = "changeit"
+        keyPassword = dummyPassword,
+        jksPassword = dummyPassword
     )
     val environment = applicationEngineEnvironment {
         connector {
@@ -32,8 +33,8 @@ fun main() {
         sslConnector(
             keyStore = keystore,
             keyAlias = "ev3dev",
-            keyStorePassword = { "changeit".toCharArray() },
-            privateKeyPassword = { "changeit".toCharArray() }) {
+            keyStorePassword = { dummyPassword.toCharArray() },
+            privateKeyPassword = { dummyPassword.toCharArray() }) {
             port = 8443
             keyStorePath = keyStoreFile
         }
