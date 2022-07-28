@@ -4,17 +4,18 @@
 
 /* global poseDetection */
 
+import {RateLimit} from "./rate-limit.js";
+
 class SimplePose {
     #video;
+    /** @type {CanvasRenderingContext2D} */
     #videoOutCtx;
     #socket = null;
     #detector = null;
-    /** @type {boolean} */
-    poseLoop = true;
-
     #sourceDimensions = {width: 360, height: 270};
     #displayDimensions = {width: 720, height: 540, scale: 2};
-
+    /** @type {RateLimit} */
+    #looper;
 
     constructor() {
         this.#video = document.getElementById("video");
@@ -26,7 +27,6 @@ class SimplePose {
         };
         /** @type {HTMLCanvasElement} */
         const videoOut = document.getElementById("canvas");
-        /** @type {CanvasRenderingContext2D} */
         this.#videoOutCtx = videoOut.getContext("2d");
         screen.orientation.onchange = () => {
             console.info("screen.orientation.onchange")
@@ -36,10 +36,12 @@ class SimplePose {
             console.info("window.onresize")
             this.#updateDimensions();
         };
-
     }
 
-    /** Rescale everything based on source dimensions and display width */
+    /**
+     * Rescale everything based on source dimensions and display width
+     * TODO: Max Height
+     */
     #updateDimensions() {
         this.#sourceDimensions.width = this.#video.videoWidth;
         this.#sourceDimensions.height = this.#video.videoHeight;
@@ -58,7 +60,8 @@ class SimplePose {
     async run() {
         await Promise.all([this.#startVideoStream(), this.#createPoseDetector(), this.#openServerCommunication()]);
         this.#updateDimensions();
-        this.#estimatePoses();
+        this.#looper = new RateLimit(async ()=> { await this.#estimatePoses() }, .2, 100);
+        await this.#looper.run();
     }
 
     /**
@@ -94,7 +97,7 @@ class SimplePose {
     async #createPoseDetector() {
         console.time("#createPoseDetector");
         const detectorConfig = {
-            modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
+            modelType: poseDetection.movenet.modelType.MULTIPOSE_LIGHTNING,
             enableTracking: true,
             trackerType: poseDetection.TrackerType.BoundingBox
         };
@@ -102,32 +105,26 @@ class SimplePose {
         console.timeEnd("#createPoseDetector");
     }
 
-    #estimatePoses() {
-        if (!this.poseLoop) {
-            console.warn("poseLoop is false, forcing estimatePoses ending.")
-            return;
+    async #estimatePoses() {
+        const poses = await this.#detector.estimatePoses(video);
+        this.#videoOutCtx.drawImage(this.#video, 0, 0, this.#displayDimensions.width, this.#displayDimensions.height);
+        this.#videoOutCtx.fillText(`${Math.round(this.#looper.totalTimeMs)}ms`, 0, 0);
+        if (poses && poses[0] && poses[0].keypoints && poses[0].keypoints.length > 0) {
+            this.#displayKeypoints(poses[0].keypoints);
+            this.#logKeypoints(poses[0].keypoints);
+        } else {
+            console.debug("No pose found, skipping.");
         }
-        // Use setTimeout to avoid overrun on slow devices.
-        setTimeout(async () => {
-            // console.time("detector.estimatePoses(video)");
-            const poses = await this.#detector.estimatePoses(video);
-            if (poses && poses[0] && poses[0].keypoints && poses[0].keypoints.length > 0) {
-                this.#processKeypoints(poses[0].keypoints);
-            } else {
-                console.debug("No pose found, skipping.");
-            }
-            this.#estimatePoses();
-        }, 250);
     }
 
     /**
      * @param {{score: number, x: number, y:number, name: string}[]} keypoints
      */
-    #processKeypoints(keypoints) {
-        this.#videoOutCtx.drawImage(this.#video, 0, 0, this.#displayDimensions.width, this.#displayDimensions.height);
-        this.#videoOutCtx.font = "1em sans-serif";
+    #displayKeypoints(keypoints) {
+        this.#videoOutCtx.font = "2em sans-serif";
         this.#videoOutCtx.fillStyle = "#00ffff";
         this.#videoOutCtx.strokeStyle = "#00ffff";
+        this.#videoOutCtx.textBaseline = "top";
         this.#videoOutCtx.lineWidth = 2;
 
         // Draw the named points
@@ -147,7 +144,12 @@ class SimplePose {
                 this.#videoOutCtx.lineTo(keypoints[p2].x * this.#displayDimensions.scale, keypoints[p2].y * this.#displayDimensions.scale);
                 this.#videoOutCtx.stroke();
             });
+    }
 
+    /**
+     * @param {{score: number, x: number, y:number, name: string}[]} keypoints
+     */
+    #logKeypoints(keypoints) {
         if (this.#socket && this.#socket.readyState === WebSocket.OPEN) {
             const poseAsString = JSON.stringify(keypoints, (key, val) => {
                 // round the long decimals to int

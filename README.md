@@ -28,3 +28,7 @@ made from LEGO Mindstorms EV3 and some custom code.
 * https://github.com/tensorflow/tfjs-models/tree/master/pose-detection/src/blazepose_mediapipe
 * https://tfhub.dev/google/lite-model/movenet/singlepose/lightning/tflite/int8/4
 * https://tfhub.dev/google/movenet/singlepose/lightning/4
+
+## TODO
+
+* https://christianheilmann.com/2013/07/19/flipping-the-image-when-accessing-the-laptop-camera-with-getusermedia/
