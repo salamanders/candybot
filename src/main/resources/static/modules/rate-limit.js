@@ -1,5 +1,6 @@
 /* jshint esversion: 11 */
 /* jshint quotmark: double */
+
 /* jshint forin: true */
 
 
@@ -15,6 +16,11 @@ class RateLimit {
     /** @type {number} most recent busy time */
     totalTimeMs = 0;
 
+    /**
+     * @param {function} fn
+     * @param {number} minPercentIdle
+     * @param {number} minCoolDownMs
+     */
     constructor(fn, minPercentIdle = 0.0, minCoolDownMs = 0) {
         this.#fn = fn;
         this.#minPercentIdle = minPercentIdle;
@@ -45,4 +51,4 @@ class RateLimit {
     }
 }
 
-export { RateLimit }
+export {RateLimit}

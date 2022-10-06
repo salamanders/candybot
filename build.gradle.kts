@@ -29,9 +29,9 @@ dependencies {
     implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-websockets-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
 
     implementation("com.github.jaakkos:ev3dev-lang-java:a379a53500")
-    implementation("io.ktor:ktor-network-tls-certificates:$ktorVersion")
+    implementation("io.ktor:ktor-server-netty-jvm:2.1.1")
+    implementation("io.ktor:ktor-network-tls-certificates-jvm:2.1.1")
 }

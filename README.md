@@ -19,6 +19,10 @@ made from LEGO Mindstorms EV3 and some custom code.
 12. Converted to Motor Control signals
 13. Which moves the robot, lowers the claw, grabs, candy, and delivers it to their waiting outstretched hands!
 
+## Localhost SSL
+
+`keytool -keystore keystore.jks -alias ev3dev -genkeypair -keyalg RSA -keysize 4096 -validity 90 -dname 'CN=ev3dev, OU=ktor, O=ktor, L=Unspecified, ST=Unspecified, C=US'`
+
 
 ## Resources
 

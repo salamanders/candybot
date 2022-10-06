@@ -10,15 +10,12 @@ import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.server.websocket.*
-import io.ktor.websocket.*
 import kotlinx.coroutines.delay
 import lejos.hardware.port.MotorPort
 import java.io.File
-import java.time.Duration
 
 fun main() {
-    val dummyPassword = "changeit";
+    val dummyPassword = "changeit"
     val keyStoreFile = File("src/main/resources/keystore.jks")
     val keystore = generateCertificate(
         file = keyStoreFile,
@@ -30,6 +27,8 @@ fun main() {
         connector {
             port = 8080
         }
+        developmentMode = true
+        watchPaths = listOf("classes", "resources")
         sslConnector(
             keyStore = keystore,
             keyAlias = "ev3dev",
@@ -40,7 +39,6 @@ fun main() {
         }
         module(Application::static)
         module(Application::controls)
-        module(Application::webSockets)
     }
 
     embeddedServer(Netty, environment).start(wait = true)
@@ -67,31 +65,8 @@ fun Application.controls() {
             call.respondText("Going Medium!")
             runMotorA()
         }
-        get("/json/kotlinx-serialization") {
-            call.respond(mapOf("hello" to "world"))
-        }
-    }
-}
-
-fun Application.webSockets() {
-    install(WebSockets) {
-        pingPeriod = Duration.ofSeconds(15)
-        timeout = Duration.ofSeconds(30)
-        maxFrameSize = Long.MAX_VALUE
-        masking = false
-    }
-
-    routing {
-        webSocket("/ws") { // websocketSession
-            for (frame in incoming) {
-                if (frame is Frame.Text) {
-                    val text = frame.readText()
-                    // outgoing.send(Frame.Text("ACK ${text.length}"))
-                    if (text.equals("bye", ignoreCase = true)) {
-                        close(CloseReason(CloseReason.Codes.NORMAL, "Client said BYE"))
-                    }
-                }
-            }
+        post("/move") {
+            call.respond(mapOf("status" to "ok"))
         }
     }
 }
