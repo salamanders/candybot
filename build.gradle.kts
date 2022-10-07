@@ -4,8 +4,8 @@ val logbackVersion: String by project
 
 plugins {
     application
-    kotlin("jvm") version "1.7.10"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.7.10"
+    kotlin("jvm") version "1.7.20"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.7.20"
 }
 
 group = "info.benjaminhill"
@@ -32,6 +32,6 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
 
     implementation("com.github.jaakkos:ev3dev-lang-java:a379a53500")
-    implementation("io.ktor:ktor-server-netty-jvm:2.1.1")
-    implementation("io.ktor:ktor-network-tls-certificates-jvm:2.1.1")
+    implementation("io.ktor:ktor-server-netty-jvm:2.1.2")
+    implementation("io.ktor:ktor-network-tls-certificates-jvm:2.1.2")
 }

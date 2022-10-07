@@ -1,6 +1,9 @@
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
+    <meta charset="utf-8">
+
     <link href="data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA/4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAERERERERERERAAAAAAAAERAQAAAAAAEBEAEAAAAAEAEQABAAAAEAARAAAQAAEAABEAAAEAEAAAEQAAABEAAAARAAAAEQAAABEAAAEAEAAAEQAAEAABAAARAAEAAAAQABEAEAAAAAEAEQEAAAAAABAREAAAAAAAAREREREREREREAAAAAP/wAAF/6AABv9gAAd+4AAHveAAB9vgAAfn4AAH5+AAB9vgAAe94AAHfuAABv9gAAX/oAAD/8AAAAAAAA"
           rel="icon" type="image/x-icon"/>
     <link href="./css/reset.css" media="all" rel="stylesheet"/>
@@ -13,6 +16,10 @@
     <!-- ALT <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm/dist/tf-backend-wasm.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
 
+    <script src="./js_helpers/webgl-utils.js" type="text/javascript" ></script>
+    <script src="./js_helpers/simpleHelpers.js" type="text/javascript"></script>
+    <script src="./js_helpers/perlin.js" type="text/javascript"></script>
+
     <style>
         html, body {
             background-color: black;
@@ -22,6 +29,7 @@
         }
         canvas {
             border: solid 1px #005;
+            background-color: rgb(0, 0, 0);
             transform: scale(-1, 1);
         }
     </style>
@@ -31,6 +39,7 @@
 <video autoplay class="hidden" height="480" id="video" width="640"></video>
 <canvas height="480" id="canvas" width="640"></canvas>
 
+<script src="./js/sparkles.js" type="text/javascript"></script>
 <script src="./js/main.js" type="module"></script>
 </body>
 </html>
