@@ -1,9 +1,8 @@
 /* jshint esversion: 11 */
 /* jshint quotmark: double */
-
 /* jshint forin: true */
 
-
+/** Repeatedly call a function, but not too often */
 class RateLimit {
     /** @type {function} */
     #fn;

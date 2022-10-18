@@ -263,3 +263,5 @@ $RECYCLE.BIN/
 /src/main/resources/static/node_modules/
 /src/main/resources/static/scratch.txt
 /src/main/resources/keystore.jks
+/src/main/node_modules/
+/src/main/resources/static/attempts/**

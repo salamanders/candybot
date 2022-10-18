@@ -1,0 +1,9 @@
+{
+  "name": "main",
+  "version": "1.0.0",
+  "dependencies": {
+    "@tensorflow-models/pose-detection": "^2.0.0",
+    "tensorflow-models": "^0.0.1",
+    "three": "^0.145.0"
+  }
+}
