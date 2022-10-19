@@ -1,4 +1,23 @@
-        #videoCanvas {
+ //"tensorflow/": "https://cdn.jsdelivr.net/npm/@tensorflow/",
+ //"tensorflow-models/": "https://cdn.jsdelivr.net/npm/@tensorflow-models/"
+
+   <script async src="https://unpkg.com/es-module-shims@1.6.2/dist/es-module-shims.js"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.145.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.145.0/examples/jsm/"
+        }
+      }
+    </script>
+
+     // import crypto from 'https://cdn.skypack.dev/crypto-browserify';
+ // import lodash from 'https://cdn.skypack.dev/three-nebula';
+
+         "crypto-es": "https://unpkg.com/crypto-es@1.2.7/"
+                    "tensorflow/": "https://cdn.jsdelivr.net/npm/@tensorflow/",
+          "tensorflow-models/": "https://cdn.jsdelivr.net/npm/@tensorflow-models/"
+                  #videoCanvas {
             background-color: rgb(0, 0, 0);
             border: solid 1px #005;
             transform: scale(-1, 1);
@@ -13,7 +32,7 @@ import poseDetection from '@tensorflow-models/pose-detection';
 
         }
                 /*
-        this.videoOutCtx.drawImage(this.video, 0, 0, this.displayDimensions.width, this.displayDimensions.height);
+
         this.videoOutCtx.fillText(`${Math.round(this.#looper.totalTimeMs)}ms`, 0, 0);
         if (poses && poses[0] && poses[0].keypoints && poses[0].keypoints.length > 0) {
             this.#displayKeypoints(poses[0].keypoints);
@@ -57,6 +76,10 @@ canvas {
     z-index: 2;
 }
 */
+export function stringifyRounded(val) {
+    // round the long decimals to int
+    return val.toFixed ? Number(val.toFixed(0)) : val;
+}
 
 
 <video autoplay class="hidden" height="480" id="video" width="640"></video>
@@ -71,12 +94,12 @@ canvas {
         }
     }
 
-import {RateLimit} from "./rate-limit.mjs";
+import {RateLimitMjs} from "./rate-limit.mjs.old";
 import {SimpleVideo} from "./simple-video.js";
 
  extends SimpleVideo {
 
-    /** @type {RateLimit} */
+    /** @type {RateLimitMjs} */
     #looper;
 
 
@@ -84,7 +107,7 @@ import {SimpleVideo} from "./simple-video.js";
     async run() {
         await Promise.all([super.run(), this.#createPoseDetector()]);
         //this.updateDimensions();
-        this.#looper = new RateLimit(async () => {
+        this.#looper = new RateLimitMjs(async () => {
             await this.#estimatePoses()
         }, .2, 100);
         await this.#looper.run();
@@ -149,33 +172,5 @@ import {SimpleVideo} from "./simple-video.js";
 <script src="./js/main.mjs" type="module"></script>
 
 
-        screen.orientation.onchange = () => {
-            console.info("screen.orientation.onchange")
-            this.updateDimensions();
-        };
-        window.onresize = () => {
-            console.info("window.onresize")
-            this.updateDimensions();
-        };
 
 
-     /**
-      * Rescale everything based on source dimensions and display width
-      */
-     updateDimensions() {
-         this.#sourceDimensions.width = this.video.videoWidth;
-         this.#sourceDimensions.height = this.video.videoHeight;
-
-         const scaleToWidth = window.innerWidth / this.#sourceDimensions.width;
-         const scaleToHeight = window.innerHeight / this.#sourceDimensions.height;
-         this.displayDimensions.scale = Math.min(scaleToWidth, scaleToHeight);
-         this.displayDimensions.width = this.#sourceDimensions.width * this.displayDimensions.scale;
-         this.displayDimensions.height = this.#sourceDimensions.height * this.displayDimensions.scale;
-
-         this.videoOutCtx.scale(this.displayDimensions.scale, this.displayDimensions.scale);
-         this.videoOutCtx.canvas.width = this.displayDimensions.width;
-         this.videoOutCtx.canvas.height = this.displayDimensions.height;
-
-         console.info("Source:", this.#sourceDimensions);
-         console.info("Display:", this.displayDimensions);
-     }
