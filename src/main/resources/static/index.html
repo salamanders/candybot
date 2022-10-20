@@ -23,37 +23,28 @@
         import * as WEBCAM from "./modules/simple-webcam.mjs";
         import * as POSE from "./modules/simple-pose.mjs";
         import * as PARTICLES from "./modules/particles.mjs";
+        import * as CONFIG from "./modules/config.mjs";
 
         await blockUntilDOMReady();
         await WEBCAM.setup();
         STAGE.setup(WEBCAM.video);
         await POSE.setup();
 
-        /**
-         * Always have a loop
-         * @param {DOMHighResTimeStamp} ts
-         */
+        // Always have a loop
         async function frameUpdates(ts) {
-
             const keypoints = await POSE.estimatePoses(WEBCAM.video);
-            if (keypoints && keypoints.length > 0) {
-                // console.log(JSON.stringify(currentPose));
-                const leftWrist = keypoints.find(keypoint => keypoint.name === 'left_wrist');
-                const rightWrist = keypoints.find(keypoint => keypoint.name === 'right_wrist');
-                const anyWrist = leftWrist ?? rightWrist;
-                if (anyWrist) {
-                    console.log(`Wrist:`, anyWrist);
-                    PARTICLES.spawn(anyWrist.x, anyWrist.y);
-                }
-            }
-
-            // STAGE.ctx.drawImage(WEBCAM.video, 0, 0);
+            keypoints?.filter(keypoint=>keypoint.name.endsWith('_wrist')).forEach(wrist=>{
+                PARTICLES.spawn(wrist.x, wrist.y);
+            });
+            STAGE.ctx.globalAlpha = 1;
+            STAGE.ctx.drawImage(WEBCAM.video, 0, 0);
             PARTICLES.moveAndDraw(STAGE.ctx);
             requestAnimationFrame(frameUpdates);
         }
 
         console.info(`Kicking off the animation loop.`);
         requestAnimationFrame(frameUpdates);
+
     </script>
 </head>
 <body>

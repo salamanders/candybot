@@ -27,14 +27,26 @@ export class RateLimiter {
     #minCoolDownMs;
     /** @type {DOMHighResTimeStamp} */
     #lastFired = 0;
-
-    constructor(minCoolDownMs = 100) {
+    #lastReport;
+    #fireCount = 0;
+    #totalHits = 0;
+    #name;
+    constructor(minCoolDownMs = 100, name = '') {
         this.#minCoolDownMs = minCoolDownMs;
+        this.#lastReport = performance.now();
+        this.#name = name;
     }
 
     fire() {
-        if (performance.now() - this.#lastFired >= this.#minCoolDownMs) {
-            this.#lastFired = performance.now();
+        const currentTimeMs = performance.now();
+        this.#totalHits++;
+        if(currentTimeMs - this.#lastReport > 10_000) {
+            console.info(`RateLimiter (${this.#name}) fired ${this.#fireCount}/${this.#totalHits}`);
+            this.#lastReport = currentTimeMs;
+        }
+        if (currentTimeMs - this.#lastFired >= this.#minCoolDownMs) {
+            this.#lastFired = currentTimeMs;
+            this.#fireCount++;
             return true;
         }
         return false;
