@@ -1,5 +1,6 @@
 /* jshint esversion: 11 */
 /* jshint quotmark: single */
+
 /* jshint forin: true */
 
 export class SpriteMap {
@@ -15,8 +16,6 @@ export class SpriteMap {
     #tileHeight;
     /** @type {Number} */
     #frameDelayMs;
-    /** @type {DOMHighResTimeStamp} */
-    #globalCreatedMs = performance.now();
 
     /**
      * @param {string} uri
@@ -27,7 +26,7 @@ export class SpriteMap {
         this.#numTilesX = options['numTilesX'] ?? 1;
         this.#numTilesY = options['numTilesY'] ?? 1;
         this.#frameDelayMs = options['frameDelayMs'] ?? 50;
-        this.load().then(() => console.log(`SpriteMap(${this.#uri}) loaded.`))
+        this.load().then(() => console.info(`SpriteMap(${this.#uri}) loaded.`))
     }
 
     async load() {
@@ -42,9 +41,9 @@ export class SpriteMap {
      * @param {Number} targetCenterY
      * @param {DOMHighResTimeStamp} createdMs
      */
-    drawSprite(ctx, targetCenterX, targetCenterY, createdMs = this.#globalCreatedMs) {
-        if (!this.#image) {
-            return;
+    drawSprite(ctx, targetCenterX, targetCenterY, createdMs) {
+        if (!ctx || !targetCenterX || !targetCenterY || !createdMs) {
+            throw new Error("missing required params");
         }
         const currentFrame = Math.floor((performance.now() - createdMs) / this.#frameDelayMs) % (this.#numTilesX * this.#numTilesY);
         const spriteTileX = currentFrame % this.#numTilesX;
@@ -61,7 +60,6 @@ export class SpriteMap {
             this.#tileWidth, this.#tileHeight
         )
     }
-
 }
 
 /**
@@ -69,7 +67,7 @@ export class SpriteMap {
  * @param {string} src
  * @return {Promise<HTMLImageElement>}
  */
-function loadImage(src) {
+export function loadImage(src) {
     return new Promise((resolve, reject) => {
         const img = new Image();
         img.onload = () => resolve(img);

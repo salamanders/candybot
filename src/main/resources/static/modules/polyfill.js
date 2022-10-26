@@ -31,6 +31,7 @@ export class RateLimiter {
     #fireCount = 0;
     #totalHits = 0;
     #name;
+
     constructor(minCoolDownMs = 100, name = '') {
         this.#minCoolDownMs = minCoolDownMs;
         this.#lastReport = performance.now();
@@ -40,7 +41,7 @@ export class RateLimiter {
     fire() {
         const currentTimeMs = performance.now();
         this.#totalHits++;
-        if(currentTimeMs - this.#lastReport > 10_000) {
+        if (currentTimeMs - this.#lastReport > 10_000) {
             console.info(`RateLimiter (${this.#name}) fired ${this.#fireCount}/${this.#totalHits}`);
             this.#lastReport = currentTimeMs;
         }
@@ -65,11 +66,33 @@ export function filterInPlace(a, condition, thisArg) {
 
     a.forEach((e, i) => {
         if (condition.call(thisArg, e, i, a)) {
-            if (i!==j) a[j] = e;
+            if (i !== j) a[j] = e;
             j++;
         }
     });
 
     a.length = j;
     return a;
+}
+
+// Same as randomInt, but returns a float
+export function randomFloat(start, end) {
+    if (end === undefined)
+        return randomFloat(0, start);
+    else
+        return Math.random() * (end - start) + start;
+
+}
+
+export function randomSpread(center, spread) {
+    return randomFloat(center - spread, center + spread);
+}
+
+export const cartesian =
+    (...a) => a.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())));
+
+export function dump(val) {
+    console.debug('dump', JSON.stringify(val, function (key, val) {
+        return val.toFixed ? Number(val.toFixed(3)) : val;
+    }));
 }

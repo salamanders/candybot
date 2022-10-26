@@ -3,7 +3,7 @@
 
 /* jshint forin: true */
 
-/** Track a value over time. */
+/** Track a value over time.  If you want to track frequency use hit(). */
 class MovingStats {
     /** @type {string} */
     name;
@@ -24,6 +24,9 @@ class MovingStats {
      * @param {number} logEveryNSeconds
      */
     constructor(name, maxSize = 100, logEveryNSeconds = 10) {
+        if (!name) {
+            throw new Error("`name` is required");
+        }
         this.name = name;
         this.#maxSize = maxSize;
         this.#logEveryNMs = logEveryNSeconds * 1000;

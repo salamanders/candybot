@@ -1,28 +1,28 @@
 package info.benjaminhill.candybot
 
-import ev3dev.actuators.lego.motors.EV3MediumRegulatedMotor
-import io.ktor.network.tls.certificates.*
+import ev3dev.actuators.lego.motors.EV3LargeRegulatedMotor
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.http.content.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.coroutines.delay
+import kotlinx.serialization.Serializable
 import lejos.hardware.port.MotorPort
-import java.io.File
+import java.io.*
+import java.security.KeyStore
+
+
+const val DUMMY_PASSWORD = "changeme"
+const val KEY_ALIAS = "ev3dev"
+ val KEYSTORE_FILE = File("src/main/resources/keystore.jks")
 
 fun main() {
-    val dummyPassword = "changeit"
-    val keyStoreFile = File("src/main/resources/keystore.jks")
-    val keystore = generateCertificate(
-        file = keyStoreFile,
-        keyAlias = "ev3dev",
-        keyPassword = dummyPassword,
-        jksPassword = dummyPassword
-    )
+    val keystore = KeyStore.getInstance(KEYSTORE_FILE, DUMMY_PASSWORD.toCharArray())
+
     val environment = applicationEngineEnvironment {
         connector {
             port = 8080
@@ -31,11 +31,11 @@ fun main() {
         watchPaths = listOf("classes", "resources")
         sslConnector(
             keyStore = keystore,
-            keyAlias = "ev3dev",
-            keyStorePassword = { dummyPassword.toCharArray() },
-            privateKeyPassword = { dummyPassword.toCharArray() }) {
+            keyAlias = KEY_ALIAS,
+            keyStorePassword = { DUMMY_PASSWORD.toCharArray() },
+            privateKeyPassword = { DUMMY_PASSWORD.toCharArray() }) {
             port = 8443
-            keyStorePath = keyStoreFile
+            keyStorePath = KEYSTORE_FILE
         }
         module(Application::static)
         module(Application::controls)
@@ -54,6 +54,10 @@ fun Application.static() {
         }
     }
 }
+@Serializable
+data class MoveRequest(
+    val action: String
+)
 
 fun Application.controls() {
     install(ContentNegotiation) {
@@ -61,22 +65,23 @@ fun Application.controls() {
     }
 
     routing {
-        get("/go") {
-            call.respondText("Going Medium!")
-            runMotorA()
-        }
         post("/move") {
-            call.respond(mapOf("status" to "ok"))
+            val moveRequest = call.receive<MoveRequest>()
+            println("Got a MoveRequest:${moveRequest}")
+            call.respond(
+                mapOf(
+                    "status" to "ack",
+                    "action" to moveRequest.action
+                )
+            )
+            val mA = EV3LargeRegulatedMotor(MotorPort.A)
+            mA.speed = mA.maxSpeed.toInt()
+            when (moveRequest.action) {
+                "forward" -> mA.forward()
+                "backward" -> mA.backward()
+                "stop" -> mA.stop()
+                else -> println("Unknown action `${moveRequest.action}`")
+            }
         }
     }
-}
-
-suspend fun runMotorA() {
-    println("runMotorA")
-    val mA = EV3MediumRegulatedMotor(MotorPort.A)
-    mA.speed = 500
-    mA.brake()
-    mA.forward()
-    delay(1000)
-    mA.stop()
 }

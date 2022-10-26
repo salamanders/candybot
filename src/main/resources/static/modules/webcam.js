@@ -2,7 +2,7 @@
 /* jshint quotmark: single */
 /* jshint forin: true */
 
-import * as CONFIG from './config.mjs';
+import * as CONFIG from './config.js';
 
 /** @type {HTMLVideoElement} */
 export let video;
@@ -25,7 +25,7 @@ export async function setup() {
             video: {
                 width: {ideal: CONFIG.WIDTH},
                 height: {ideal: CONFIG.HEIGHT},
-                facingMode: {ideal: 'user'},
+                facingMode: {ideal: 'environment'},
                 frameRate: {ideal: CONFIG.FPS},
                 zoom: true
             }
@@ -46,15 +46,19 @@ export async function setup() {
         if ('zoom' in settings) {
             console.info('Attempting to zoom out...');
             await track.applyConstraints({advanced: [{zoom: capabilities.zoom.min}]});
+            console.info('zoomed out!')
         } else {
             console.info(`Not zoom capable.`);
         }
-
-        /** @type {ImageBitmap} */
-        new ImageCapture(track).grabFrame().then(imageBitmap=>{
-            console.info(`imageCapture webcam resolution: ${imageBitmap.width}, ${imageBitmap.height}`);
-        });
     });
 }
 
+/** @param {CanvasRenderingContext2D} ctx */
+export function draw(ctx) {
+    //ctx.save();
+    //ctx.scale(-1, 1);
+    //ctx.translate(-width, 0);
+    ctx.drawImage(video, 0, 0);
+    //ctx.restore();
+}
 

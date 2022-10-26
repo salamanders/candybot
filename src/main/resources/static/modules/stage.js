@@ -2,7 +2,7 @@
 /* jshint quotmark: single */
 /* jshint forin: true */
 
-import * as CONFIG from "./config.mjs";
+import * as CONFIG from "./config.js";
 
 /** @type {HTMLVideoElement} */
 let video;
@@ -26,26 +26,38 @@ export function setup(source) {
     document.body.appendChild(canvas);
     ctx = canvas.getContext('2d');
     updateDimensions();
+    setStyle();
 }
+
 /**
  * Rescale everything based on source dimensions and display width
  */
 function updateDimensions() {
     const scaleToWidth = window.innerWidth / video.videoWidth;
     const scaleToHeight = window.innerHeight / video.videoHeight;
-     const bestScale = Math.min(scaleToWidth, scaleToHeight);
+    const bestScale = Math.min(scaleToWidth, scaleToHeight);
     canvas.width = Math.round(bestScale * video.videoWidth);
     canvas.height = Math.round(bestScale * video.videoHeight);
     ctx.scale(bestScale, bestScale);
     console.info(`Scaled from webcam (${video.videoWidth}, ${video.videoHeight}) to page (x:${canvas.width}, y:${canvas.height}, scale:${bestScale})`);
 }
 
+function setStyle() {
+    ctx.font = "1em sans-serif";
+    ctx.fillStyle = "#00ffff";
+    ctx.strokeStyle = "#00ffff";
+    ctx.textBaseline = "top";
+    ctx.lineWidth = 8;
+}
+
 screen.orientation.onchange = () => {
     console.info("screen.orientation.onchange")
     updateDimensions();
+    setStyle();
 };
 
 window.onresize = () => {
     console.info("window.onresize")
     updateDimensions();
+    setStyle();
 };

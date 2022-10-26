@@ -129,17 +129,14 @@ import {SimpleVideo} from "./simple-video.js";
             const realX = x * this.displayDimensions.scale;
             const realY = y * this.displayDimensions.scale;
             this.videoOutCtx.fillText(name, realX, realY);
-            // console.log(`(${Math.round(x)}, ${Math.round(y)}) ${name} = ${Math.round((score + Number.EPSILON) * 100) / 100}`);
+            // `(${Math.round(x)}, ${Math.round(y)}) ${name} = ${Math.round((score + Number.EPSILON) * 100) / 100}`);
         });
 
         // Draw the Skeleton
         SimplePose.CONNECTED_PAIRS
             .filter(([p1, p2]) => keypoints[p1].score >= 0.3 && keypoints[p2].score >= 0.3)
             .forEach(([p1, p2]) => {
-                this.videoOutCtx.beginPath();
-                this.videoOutCtx.moveTo(keypoints[p1].x * this.displayDimensions.scale, keypoints[p1].y * this.displayDimensions.scale);
-                this.videoOutCtx.lineTo(keypoints[p2].x * this.displayDimensions.scale, keypoints[p2].y * this.displayDimensions.scale);
-                this.videoOutCtx.stroke();
+
             });
     }
 
@@ -149,17 +146,7 @@ import {SimpleVideo} from "./simple-video.js";
      */
     #logKeypoints(keypoints) {
         (async () => {
-            const rawResponse = await fetch('/move', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(keypoints, SimplePose.stringifyRounded)
-            });
-            const content = await rawResponse.json();
-            console.debug(content);
-        })();
+            const rawResponse = await
     }
 }
 
