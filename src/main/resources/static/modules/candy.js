@@ -21,9 +21,7 @@ const sigil = new SpriteMap('/img/sigil_256.png', {
 });
 await sigil.load();
 
-const LIFT_MS = 2_000;
-const HOLD_OPEN_MS = 5_000;
-const LOWER_MS = 2_000;
+const SEQUENCE_DURATION = 8_000;
 
 let lastTriggered = performance.now();
 
@@ -55,13 +53,10 @@ function signal(message) {
 
 function triggerReward() {
     const currentMs = performance.now();
-    if (currentMs > lastTriggered + LIFT_MS + HOLD_OPEN_MS + LOWER_MS) {
+    if (currentMs > lastTriggered + SEQUENCE_DURATION) {
         lastTriggered = currentMs;
         console.warn('Successful triggering!  Starting lift, hold, close sequence.');
-        setTimeout(() => signal('forward'), 0);
-        setTimeout(() => signal('stop'), LIFT_MS);
-        setTimeout(() => signal('backward'), LIFT_MS + HOLD_OPEN_MS);
-        setTimeout(() => signal('stop'), LIFT_MS + HOLD_OPEN_MS + LOWER_MS);
+        signal('OPEN_HOLD_CLOSE');
     } else {
         console.debug("Skipping trigger, still acting on last.");
     }

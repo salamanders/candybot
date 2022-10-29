@@ -3,6 +3,17 @@
 
 /* jshint forin: true */
 
+/**
+ * fetch handler
+ * @param {Response} response
+ * @return {{ok}|*}
+ */
+export function handleErrors(response) {
+    if (!response.ok) {
+        console.error(response.statusText);
+    }
+    return response;
+}
 
 /**
  * Await enabled image loader polyfill
