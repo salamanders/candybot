@@ -30,7 +30,7 @@ const poseStats = new MovingStats('pose estimation', 5_000);
  */
 export async function estimatePoses(video) {
     const startTime = performance.now();
-    // todo input_size = 192
+    // where H and W need to be a multiple of 32 and the larger dimension is recommended to be 256
     /** @type {Object[]} */
     const poses = (await detector.estimatePoses(video))?.filter(pose => pose?.keypoints?.length > 0);
     poseStats.add(performance.now() - startTime);

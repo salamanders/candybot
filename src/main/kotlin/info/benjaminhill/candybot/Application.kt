@@ -74,12 +74,12 @@ fun Application.controls() {
                     "action" to moveRequest.action
                 )
             )
-            val mA = EV3LargeRegulatedMotor(MotorPort.A)
-            mA.speed = mA.maxSpeed.toInt()
+            val openLidMotor = EV3LargeRegulatedMotor(MotorPort.B)
+            openLidMotor.speed = openLidMotor.maxSpeed.toInt()
             when (moveRequest.action) {
-                "forward" -> mA.forward()
-                "backward" -> mA.backward()
-                "stop" -> mA.stop()
+                "forward" -> openLidMotor.forward()
+                "backward" -> openLidMotor.backward()
+                "stop" -> openLidMotor.stop()
                 else -> println("Unknown action `${moveRequest.action}`")
             }
         }

@@ -3,20 +3,30 @@ import * as STAGE from "./stage.js";
 import * as WEBCAM from "./webcam.js";
 import * as POSE from "./pose.js";
 import * as PARTICLES from "./particles.js";
+import {SpriteMap} from "./sprite-map.js";
 
 await blockUntilDOMReady();
 await WEBCAM.setup();
 STAGE.setup(WEBCAM.video);
 await POSE.setup();
 
+
+const sigil = new SpriteMap('/img/sigil_128.png', {
+    numTilesX: 1,
+    numTilesY: 1,
+    frameDelayMs: 10_000,
+    scale: .25,
+});
+await sigil.load();
+
 const LIFT_MS = 2_000;
 const HOLD_OPEN_MS = 5_000;
 const LOWER_MS = 2_000;
+
 let lastTriggered = performance.now();
 
-/** @type { DOMHighResTimeStamp[]}  */
+/** @type {Array<Object>}  */
 const recentCharges = [];
-let previousTsMs = performance.now();
 
 function handleErrors(response) {
     if (!response.ok) {
@@ -59,34 +69,47 @@ async function frameUpdates(tsMs) {
     STAGE.ctx.globalAlpha = 1;
     WEBCAM.draw(STAGE.ctx)
 
-    STAGE.ctx.globalAlpha = .5;
     const poses = await POSE.estimatePoses(WEBCAM.video);
 
+    let anyHandAboveElbow = false;
     ['left', 'right'].forEach(side => {
         const wrist = `${side}_wrist`;
         const elbow = `${side}_elbow`;
         poses?.filter(pose => pose[wrist] && pose[elbow]).forEach(pose => {
+            STAGE.ctx.globalAlpha = .5;
             STAGE.ctx.beginPath();
             STAGE.ctx.moveTo(pose[elbow].x, pose[elbow].y);
             STAGE.ctx.lineTo(pose[wrist].x, pose[wrist].y);
             STAGE.ctx.stroke();
 
+            sigil.drawSprite(STAGE.ctx, pose[wrist].x, pose[wrist].y, tsMs);
+
             // If wrist is above (lower y) than elbow
             if (pose[wrist].y < pose[elbow].y) {
+                anyHandAboveElbow = true;
                 PARTICLES.spawn(pose[wrist].x, pose[wrist].y);
-                recentCharges.unshift(tsMs);
-                recentCharges.length = 3;
-                if(recentCharges[2] > tsMs - 1_000) {
-                    recentCharges.length = 0;
-                    triggerReward();
-                } else {
-                    console.debug("Hands ok, but not triggering.");
-                }
             }
         });
     });
+
+    recentCharges.unshift({
+        "ts": tsMs,
+        "hit": anyHandAboveElbow,
+    });
+    // crop to last 1 second
+    const tooOld = recentCharges.findIndex(charge => charge?.ts < tsMs - 1_000);
+    if (tooOld > -1) {
+        recentCharges.length = tooOld;
+    }
+    // See if enough hits in last second
+    const positiveHits = recentCharges.filter(charge => charge.hit);
+    if (positiveHits > 3) {
+        recentCharges.length = 0;
+        triggerReward();
+    }
+    recentCharges.length = 3;
+
     PARTICLES.moveAndDraw(STAGE.ctx);
-    previousTsMs = tsMs;
     requestAnimationFrame(frameUpdates);
 }
 

@@ -16,6 +16,9 @@ export class SpriteMap {
     #tileHeight;
     /** @type {Number} */
     #frameDelayMs;
+    /** @type {Number} */
+    #scale;
+
 
     /**
      * @param {string} uri
@@ -26,6 +29,7 @@ export class SpriteMap {
         this.#numTilesX = options['numTilesX'] ?? 1;
         this.#numTilesY = options['numTilesY'] ?? 1;
         this.#frameDelayMs = options['frameDelayMs'] ?? 50;
+        this.#scale = options['scale'] ?? 1.0;
         this.load().then(() => console.info(`SpriteMap(${this.#uri}) loaded.`))
     }
 
@@ -33,6 +37,9 @@ export class SpriteMap {
         this.#image = await loadImage(this.#uri);
         this.#tileWidth = this.#image.width / this.#numTilesX;
         this.#tileHeight = this.#image.height / this.#numTilesY;
+        if(!this.#image || !this.#tileWidth || !this.#tileHeight) {
+            throw new Error(`Problems creating sprite for "${this.#uri}"`);
+        }
     }
 
     /**
@@ -65,13 +72,41 @@ export class SpriteMap {
 /**
  *
  * @param {string} src
+ * @param {Number} scale
  * @return {Promise<HTMLImageElement>}
  */
-export function loadImage(src) {
+export function loadImage(src, scale = 1.0) {
     return new Promise((resolve, reject) => {
         const img = new Image();
-        img.onload = () => resolve(img);
+        if(scale === 1.0) {
+            img.onload = () => resolve(img);
+        } else {
+            img.onload = () => resolve(img);
+            //  scaleImage(img, scale));
+        }
         img.onerror = reject;
         img.src = src;
     })
+}
+
+/**
+ *
+ * @param {HTMLImageElement} img
+ * @param {Number} scale
+ */
+function scaleImage(img, scale) {
+    const newWidth = img.width * scale;
+    const newHeight = img.height * scale;
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = newWidth;
+    tempCanvas.height = newHeight;
+    const tempCtx = tempCanvas.getContext("2d");
+    tempCtx.clearRect(0,0,newWidth,newHeight);
+    tempCtx.imageSmoothingEnabled = true;
+    tempCtx.imageSmoothingQuality = "high";
+    tempCtx.drawImage(img, 0, 0, newWidth, newHeight);
+    const scaled = document.createElement("img");
+    scaled.src = tempCanvas.toDataURL('image/png');
+    console.log('scale debug', scaled, typeof scaled);
+    return scaled;
 }
