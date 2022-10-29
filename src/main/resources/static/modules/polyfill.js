@@ -152,11 +152,31 @@ export function randomSpread(center, spread) {
     return randomFloat(center - spread, center + spread);
 }
 
-export const cartesian =
-    (...a) => a.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())));
-
-export function dump(val) {
-    console.debug('dump', JSON.stringify(val, function (key, val) {
-        return val.toFixed ? Number(val.toFixed(3)) : val;
-    }));
+/**
+ *
+ * @param {HTMLElement} target
+ * @return {Promise<string>}
+ */
+export async function fullscreen(target) {
+    return new Promise((resolve, reject) => {
+        if (document.fullscreenElement) {
+            resolve('Already in fullscreen.');
+        }
+        const dialog = Object.assign(document.createElement('dialog'), {
+            open: 'true',
+        });
+        const enterFullscreenButton = Object.assign(document.createElement('button'), {
+            innerHTML: 'Enter Full Screen Mode',
+            onclick: async () => {
+                dialog.remove();
+                target.requestFullscreen({'navigationUI': 'hide'})
+                    .then(() => resolve('Entered Fullscreen.'))
+                    .catch((err) => {
+                        reject(`Error attempting to enable fullscreen mode: ${err.message} (${err.name})`)
+                    });
+            }
+        });
+        dialog.appendChild(enterFullscreenButton);
+        document.body.appendChild(dialog);
+    });
 }

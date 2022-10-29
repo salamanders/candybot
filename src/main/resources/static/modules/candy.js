@@ -1,4 +1,4 @@
-import {blockUntilDOMReady, countOf} from "./polyfill.js";
+import {blockUntilDOMReady, countOf, fullscreen} from "./polyfill.js";
 import * as STAGE from "./stage.js";
 import * as WEBCAM from "./webcam.js";
 import * as POSE from "./pose.js";
@@ -10,6 +10,8 @@ await WEBCAM.setup();
 STAGE.setup();
 STAGE.setVideo(WEBCAM.video);
 await POSE.setup();
+
+console.info(await fullscreen(STAGE.canvas));
 
 const INSTRUCTIONS_UP = "⬆";
 

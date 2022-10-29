@@ -7,7 +7,7 @@ import * as CONFIG from "./config.js";
 /** @type {HTMLVideoElement} */
 let video;
 /** @type {HTMLCanvasElement} */
-let canvas;
+export let canvas;
 /** @type {CanvasRenderingContext2D} */
 export let ctx;
 
