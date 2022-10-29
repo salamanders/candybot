@@ -11,12 +11,8 @@ let canvas;
 /** @type {CanvasRenderingContext2D} */
 export let ctx;
 
-/**
- *
- * @param {HTMLVideoElement} source
- */
-export function setup(source) {
-    video = source;
+
+export function setup() {
     canvas = Object.assign(document.createElement('canvas'), {
         id: 'canvas',
         style: 'position: absolute;top: 0;left: 0',
@@ -25,14 +21,25 @@ export function setup(source) {
     });
     document.body.appendChild(canvas);
     ctx = canvas.getContext('2d');
-    updateDimensions();
     setStyle();
+}
+
+/**
+ *
+ * @param {HTMLVideoElement} source
+ */
+export function setVideo(source) {
+    video = source;
+    updateDimensions();
 }
 
 /**
  * Rescale everything based on source dimensions and display width
  */
 function updateDimensions() {
+    if (!video) {
+        throw new Error("Must call setVideo before updateDimensions");
+    }
     const scaleToWidth = window.innerWidth / video.videoWidth;
     const scaleToHeight = window.innerHeight / video.videoHeight;
     const bestScale = Math.min(scaleToWidth, scaleToHeight);
@@ -40,14 +47,16 @@ function updateDimensions() {
     canvas.height = Math.round(bestScale * video.videoHeight);
     ctx.scale(bestScale, bestScale);
     console.info(`Scaled from webcam (${video.videoWidth}, ${video.videoHeight}) to page (x:${canvas.width}, y:${canvas.height}, scale:${bestScale})`);
+    setStyle();
 }
 
 function setStyle() {
-    ctx.font = "1em sans-serif";
+    ctx.font = "6em sans-serif";
     ctx.fillStyle = "#00ffff";
     ctx.strokeStyle = "#00ffff";
     ctx.textBaseline = "top";
     ctx.lineWidth = 8;
+    ctx.globalAlpha = 1;
 }
 
 screen.orientation.onchange = () => {

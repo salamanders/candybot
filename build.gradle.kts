@@ -1,4 +1,4 @@
-val ktorVersion : String by project
+val ktorVersion: String by project
 val kotlinVersion: String by project
 val logbackVersion: String by project
 

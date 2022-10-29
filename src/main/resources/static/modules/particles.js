@@ -17,14 +17,16 @@ spriteMaps.push(
     new SpriteMap('/img/spritesheet_yellowspark.png', {
         numTilesX: 4,
         numTilesY: 4,
-        frameDelayMs: 10
+        frameDelayMs: 10,
+        scale: 1,
     }));
 
 spriteMaps.push(
     new SpriteMap('/img/spritesheet_whitespark.png', {
         numTilesX: 13,
         numTilesY: 1,
-        frameDelayMs: 17
+        frameDelayMs: 17,
+        scale: 1,
     }));
 
 await Promise.all(spriteMaps.map(sm => sm.load()));

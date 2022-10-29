@@ -1,6 +1,7 @@
 package info.benjaminhill.candybot
 
 import ev3dev.actuators.lego.motors.EV3LargeRegulatedMotor
+import io.ktor.network.tls.certificates.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -21,6 +22,16 @@ const val KEY_ALIAS = "ev3dev"
  val KEYSTORE_FILE = File("src/main/resources/keystore.jks")
 
 fun main() {
+    if(!KEYSTORE_FILE.canRead()) {
+        generateCertificate(
+            file = KEYSTORE_FILE,
+            keyAlias = KEY_ALIAS,
+            keyPassword = DUMMY_PASSWORD,
+            jksPassword = DUMMY_PASSWORD
+        )
+        println("Generated ${KEYSTORE_FILE.absolutePath}")
+    }
+
     val keystore = KeyStore.getInstance(KEYSTORE_FILE, DUMMY_PASSWORD.toCharArray())
 
     val environment = applicationEngineEnvironment {

@@ -1,4 +1,4 @@
-import {blockUntilDOMReady} from "./polyfill.js";
+import {blockUntilDOMReady, countOf} from "./polyfill.js";
 import * as STAGE from "./stage.js";
 import * as WEBCAM from "./webcam.js";
 import * as POSE from "./pose.js";
@@ -7,11 +7,13 @@ import {SpriteMap} from "./sprite-map.js";
 
 await blockUntilDOMReady();
 await WEBCAM.setup();
-STAGE.setup(WEBCAM.video);
+STAGE.setup();
+STAGE.setVideo(WEBCAM.video);
 await POSE.setup();
 
+const INSTRUCTIONS_UP = "⬆";
 
-const sigil = new SpriteMap('/img/sigil_128.png', {
+const sigil = new SpriteMap('/img/sigil_256.png', {
     numTilesX: 1,
     numTilesY: 1,
     frameDelayMs: 10_000,
@@ -26,7 +28,8 @@ const LOWER_MS = 2_000;
 let lastTriggered = performance.now();
 
 /** @type {Array<Object>}  */
-const recentCharges = [];
+const recentHistory = [];
+const MAX_HISTORY_AGE_MS = 10_000;
 
 function handleErrors(response) {
     if (!response.ok) {
@@ -87,27 +90,30 @@ async function frameUpdates(tsMs) {
             // If wrist is above (lower y) than elbow
             if (pose[wrist].y < pose[elbow].y) {
                 anyHandAboveElbow = true;
+                console.debug(`spawn`, side);
                 PARTICLES.spawn(pose[wrist].x, pose[wrist].y);
+            } else {
+                STAGE.ctx.globalAlpha = 0.5;
+                STAGE.ctx.fillText(INSTRUCTIONS_UP, pose[wrist].x, pose[wrist].y);
             }
         });
     });
 
-    recentCharges.unshift({
+    recentHistory.unshift({
         "ts": tsMs,
         "hit": anyHandAboveElbow,
     });
-    // crop to last 1 second
-    const tooOld = recentCharges.findIndex(charge => charge?.ts < tsMs - 1_000);
+    // crop to last MAX_HISTORY_AGE_MS
+    const tooOld = recentHistory.findIndex(charge => charge?.ts < tsMs - MAX_HISTORY_AGE_MS);
     if (tooOld > -1) {
-        recentCharges.length = tooOld;
+        recentHistory.length = tooOld;
     }
     // See if enough hits in last second
-    const positiveHits = recentCharges.filter(charge => charge.hit);
+
+    const positiveHits = countOf(recentHistory, charge => charge?.ts > tsMs - 1_000 && charge.hit);
     if (positiveHits > 3) {
-        recentCharges.length = 0;
         triggerReward();
     }
-    recentCharges.length = 3;
 
     PARTICLES.moveAndDraw(STAGE.ctx);
     requestAnimationFrame(frameUpdates);

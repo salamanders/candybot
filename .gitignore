@@ -266,3 +266,4 @@ $RECYCLE.BIN/
 /src/main/node_modules/
 /src/main/resources/static/attempts/**
 /src/main/package-lock.json
+/src/python/

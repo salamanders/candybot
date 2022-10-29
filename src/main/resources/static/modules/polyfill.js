@@ -3,6 +3,59 @@
 
 /* jshint forin: true */
 
+
+/**
+ * Await enabled image loader polyfill
+ * @param {string} src
+ * @return {Promise<HTMLImageElement>}
+ */
+export function loadImage(src) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+    });
+}
+
+/**
+ * The image must be fully loaded.
+ * @param {HTMLImageElement} img
+ * @param {Number} scale
+ * @return {Promise<HTMLImageElement>}
+ */
+export function scaleImage(img, scale = 1.0) {
+    if (scale === 1.0) {
+        return Promise.resolve(img);
+    }
+    const newWidth = img.width * scale;
+    const newHeight = img.height * scale;
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = newWidth;
+    tempCanvas.height = newHeight;
+    const tempCtx = tempCanvas.getContext("2d");
+    tempCtx.clearRect(0, 0, newWidth, newHeight);
+    tempCtx.imageSmoothingEnabled = true;
+    tempCtx.imageSmoothingQuality = "high";
+    tempCtx.drawImage(img, 0, 0, newWidth, newHeight);
+    return loadImage(tempCanvas.toDataURL('image/png'));
+}
+
+/**
+ *
+ * @param {Array} arr
+ * @param {function} condition
+ * @return {Number}
+ */
+export function countOf(arr, condition) {
+    return arr.reduce((accumulator, obj) => {
+        if (condition(obj)) {
+            return accumulator + 1;
+        }
+        return accumulator;
+    }, 0);
+}
+
 export async function blockUntilDOMReady() {
     return new Promise(resolve => {
         // Block on document being fully ready, in case we need to build a login button
