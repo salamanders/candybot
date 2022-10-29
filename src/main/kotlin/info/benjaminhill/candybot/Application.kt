@@ -13,16 +13,29 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 import lejos.hardware.port.MotorPort
-import java.io.*
+import java.io.File
+import java.net.NetworkInterface
 import java.security.KeyStore
 
 
 const val DUMMY_PASSWORD = "changeme"
 const val KEY_ALIAS = "ev3dev"
- val KEYSTORE_FILE = File("src/main/resources/keystore.jks")
+val KEYSTORE_FILE = File("src/main/resources/keystore.jks")
 
 fun main() {
-    if(!KEYSTORE_FILE.canRead()) {
+
+    println("Addresses")
+    NetworkInterface.getNetworkInterfaces().asSequence()
+        .filter { !it.isLoopback }
+        .filter { it.isUp }
+        .forEach { networkInterface ->
+            networkInterface.inetAddresses.asSequence()
+                .forEach { addr ->
+                    println("  ${networkInterface.displayName} ${addr.hostAddress}")
+                }
+        }
+
+    if (!KEYSTORE_FILE.canRead()) {
         generateCertificate(
             file = KEYSTORE_FILE,
             keyAlias = KEY_ALIAS,
@@ -65,6 +78,7 @@ fun Application.static() {
         }
     }
 }
+
 @Serializable
 data class MoveRequest(
     val action: String

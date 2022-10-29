@@ -23,7 +23,6 @@ made from LEGO Mindstorms EV3 and some custom code.
 
 `keytool -keystore keystore.jks -alias ev3dev -genkeypair -keyalg RSA -keysize 4096 -validity 90 -dname 'CN=ev3dev, OU=ktor, O=ktor, L=Unspecified, ST=Unspecified, C=US'`
 
-
 ## Resources
 
 * https://blog.tensorflow.org/2018/05/real-time-human-pose-estimation-in.html
@@ -35,4 +34,9 @@ made from LEGO Mindstorms EV3 and some custom code.
 
 ## TODO
 
-* https://christianheilmann.com/2013/07/19/flipping-the-image-when-accessing-the-laptop-camera-with-getusermedia/
+- [x] Long duration test 
+- [ ] Wire it up
+- [ ] Projector
+- [ ] Motor timing and speed
+- [ ] Emergency Override UI
+- [ ] https://christianheilmann.com/2013/07/19/flipping-the-image-when-accessing-the-laptop-camera-with-getusermedia/
