@@ -6,6 +6,7 @@
 import http.server
 import ssl
 
+
 class CORSRequestHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
         self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
@@ -16,9 +17,10 @@ class CORSRequestHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate')
         return super(CORSRequestHandler, self).end_headers()
 
+
 httpd = http.server.HTTPServer(('localhost', 4443), CORSRequestHandler)
-httpd.socket = ssl.wrap_socket (httpd.socket,
-                                keyfile="./key.pem",
-                                certfile='./cert.pem',
-                                server_side=True)
+httpd.socket = ssl.wrap_socket(httpd.socket,
+                               keyfile="./key.pem",
+                               certfile='./cert.pem',
+                               server_side=True)
 httpd.serve_forever()

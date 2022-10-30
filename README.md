@@ -1,6 +1,7 @@
 # CandyBot
-A Halloween Trick-or-Treat no-contact "Claw Game" 
-that trick-or-treating kids control through arm-motions to grab the candy, 
+
+A Halloween Trick-or-Treat no-contact "Claw Game"
+that trick-or-treating kids control through arm-motions to grab the candy,
 made from LEGO Mindstorms EV3 and some custom code.
 
 ## Architecture Stack
@@ -34,7 +35,7 @@ made from LEGO Mindstorms EV3 and some custom code.
 
 ## TODO
 
-- [x] Long duration test 
+- [x] Long duration test
 - [ ] Wire it up
 - [ ] Projector
 - [ ] Motor timing and speed

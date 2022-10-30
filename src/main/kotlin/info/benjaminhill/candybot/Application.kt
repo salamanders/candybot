@@ -11,21 +11,13 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.util.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import lejos.hardware.port.MotorPort
-import lejos.robotics.BaseMotor
-import lejos.robotics.RegulatedMotor
+import lejos.utility.Delay
 import java.io.File
 import java.net.NetworkInterface
 import java.security.KeyStore
-import java.util.*
-import kotlin.concurrent.schedule
-import kotlin.text.toCharArray
 
 
 const val DUMMY_PASSWORD = "changeme"
@@ -92,35 +84,48 @@ fun Application.static() {
     }
 }
 
-suspend fun doAction(action:String) {
-    when(action.lowercase()) {
+suspend fun doAction(action: String) {
+    when (action.lowercase()) {
         "open_hold_close" -> {
-            if(isKidBusy) {
+            if (isKidBusy) {
                 return
             }
             isKidBusy = true
             openLidMotor.rotate(360)
-            openLidMotor.stop()
-            delay(8_000)
+            openLidMotor.hold()
+            Delay.msDelay(8_000)
             openLidMotor.rotate(-360)
-            openLidMotor.flt()
+            openLidMotor.stop()
             isKidBusy = false
         }
+
         "forward" -> {
             openLidMotor.rotate(180)
             openLidMotor.stop()
         }
+
         "backward" -> {
             openLidMotor.rotate(-180)
             openLidMotor.stop()
         }
+
         "float" -> {
             openLidMotor.flt()
         }
+
         "stop" -> {
             openLidMotor.stop()
         }
-        else -> System.err.println("UNKNOWN `${action}`")
+
+        "hold" -> {
+            openLidMotor.stop()
+        }
+
+        "wait" -> {
+            openLidMotor.stop()
+        }
+
+        else -> System.err.println("UNKNOWN ACTION `${action}`")
     }
 }
 
