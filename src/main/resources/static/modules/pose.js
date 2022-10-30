@@ -1,6 +1,7 @@
 /* jshint esversion: 11 */
 /* jshint quotmark: single */
 /* jshint forin: true */
+// noinspection SpellCheckingInspection
 
 import 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core';
 import 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter';
