@@ -8,7 +8,7 @@
  * @param {Response} response
  * @return {{ok}|*}
  */
-export function handleErrors(response) {
+function handleErrors(response) {
     if (!response.ok) {
         console.error(response.statusText);
     }
@@ -141,10 +141,7 @@ export function filterInPlace(a, condition, thisArg) {
 
 // Same as randomInt, but returns a float
 export function randomFloat(start, end) {
-    if (end === undefined)
-        return randomFloat(0, start);
-    else
-        return Math.random() * (end - start) + start;
+    if (end === undefined) return randomFloat(0, start); else return Math.random() * (end - start) + start;
 
 }
 
@@ -166,8 +163,7 @@ export async function fullscreen(target) {
             open: 'true',
         });
         const enterFullscreenButton = Object.assign(document.createElement('button'), {
-            innerHTML: 'Enter Full Screen Mode',
-            onclick: async () => {
+            innerHTML: 'Enter Full Screen Mode', onclick: async () => {
                 dialog.remove();
                 target.requestFullscreen({'navigationUI': 'hide'})
                     .then(() => resolve('Entered Fullscreen.'))
@@ -179,4 +175,16 @@ export async function fullscreen(target) {
         dialog.appendChild(enterFullscreenButton);
         document.body.appendChild(dialog);
     });
+}
+
+export function signal(message) {
+    console.warn(`Sending signal: /motor/${message}`);
+    fetch('/motor', {
+        method: 'POST', headers: {
+            'Accept': 'application/json', 'Content-Type': 'application/json'
+        }, body: JSON.stringify({action: message})
+    })
+        .then(handleErrors)
+        .then(response => console.info("ok", response.text()))
+        .catch(error => console.error(error));
 }

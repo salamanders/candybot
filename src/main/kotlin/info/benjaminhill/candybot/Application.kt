@@ -12,6 +12,10 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.util.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import lejos.hardware.port.MotorPort
 import lejos.robotics.BaseMotor
@@ -28,8 +32,8 @@ const val DUMMY_PASSWORD = "changeme"
 const val KEY_ALIAS = "ev3dev"
 val KEYSTORE_FILE = File("src/main/resources/keystore.jks")
 
-lateinit var openLidMotor: RegulatedMotor
-var isBusy = false
+lateinit var openLidMotor: EV3LargeRegulatedMotor
+var isKidBusy = false
 
 fun main() {
 
@@ -88,47 +92,36 @@ fun Application.static() {
     }
 }
 
-@Serializable
-enum class MotorActions(
-    val exec: (motor: BaseMotor) -> Unit
-) {
-    OPEN_HOLD_CLOSE(exec = { motor ->
-        if (!isBusy) {
-            isBusy = true
-            mapOf(
-                0L to { motor.forward() },
-                2_000L to { motor.stop() },
-                7_000L to { motor.backward() },
-                9_000L to {
-                    motor.stop()
-                    isBusy = false
-                })
-                .forEach { (delay, action) ->
-                    Timer().schedule(delay) {
-                        action()
-                    }
-                }
+suspend fun doAction(action:String) {
+    when(action.lowercase()) {
+        "open_hold_close" -> {
+            if(isKidBusy) {
+                return
+            }
+            isKidBusy = true
+            openLidMotor.rotate(360)
+            openLidMotor.stop()
+            delay(8_000)
+            openLidMotor.rotate(-360)
+            openLidMotor.flt()
+            isKidBusy = false
         }
-
-    }),
-    FORWARD(exec = { motor ->
-        motor.forward()
-        Timer().schedule(1_000) {
-            motor.stop()
+        "forward" -> {
+            openLidMotor.rotate(180)
+            openLidMotor.stop()
         }
-    }),
-    BACKWARD(exec = { motor ->
-        motor.backward()
-        Timer().schedule(1_000) {
-            motor.stop()
+        "backward" -> {
+            openLidMotor.rotate(-180)
+            openLidMotor.stop()
         }
-    }),
-    STOP(exec = { motor ->
-        motor.stop()
-    }),
-    FLOAT(exec = { motor ->
-        motor.flt()
-    });
+        "float" -> {
+            openLidMotor.flt()
+        }
+        "stop" -> {
+            openLidMotor.stop()
+        }
+        else -> System.err.println("UNKNOWN `${action}`")
+    }
 }
 
 @Serializable
@@ -148,7 +141,7 @@ fun Application.controls() {
     }
 
     routing {
-        post("/move") {
+        post("/motor") {
             val moveRequest = call.receive<ActionRequest>()
             println("/move $moveRequest")
             call.respond(
@@ -158,24 +151,9 @@ fun Application.controls() {
                 )
             )
             openLidMotor.speed = openLidMotor.maxSpeed.toInt()
-            MotorActions.valueOf(moveRequest.action.toUpperCasePreservingASCIIRules()).exec(openLidMotor)
-        }
-
-        post("/remote") {
-            val remoteAction = call.receive<ActionRequest>()
-            println("/remote $remoteAction")
-            isBusy = true
-            Timer().schedule(10_000) {
-                isBusy = false
+            launch {
+                doAction(moveRequest.action)
             }
-            call.respond(
-                mapOf(
-                    "status" to "ack",
-                    "action" to remoteAction.action
-                )
-            )
-            openLidMotor.speed = (openLidMotor.maxSpeed * 0.5).toInt()
-            MotorActions.valueOf(remoteAction.action.toUpperCasePreservingASCIIRules()).exec(openLidMotor)
         }
     }
 }

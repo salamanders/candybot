@@ -3,7 +3,7 @@
 
 /* jshint forin: true */
 
-import {loadImage, scaleImage} from "./polyfill.js";
+import {loadImage, scaleImage} from "./shared.js";
 
 export class SpriteMap {
     #uri;

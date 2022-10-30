@@ -1,4 +1,4 @@
-import {blockUntilDOMReady, countOf, fullscreen} from "./polyfill.js";
+import {blockUntilDOMReady, countOf, fullscreen, signal} from "./shared.js";
 import * as STAGE from "./stage.js";
 import * as WEBCAM from "./webcam.js";
 import * as POSE from "./pose.js";
@@ -31,34 +31,12 @@ let lastTriggered = performance.now();
 const recentHistory = [];
 const MAX_HISTORY_AGE_MS = 10_000;
 
-function handleErrors(response) {
-    if (!response.ok) {
-        console.error(response.statusText);
-    }
-    return response;
-}
-
-function signal(message) {
-    console.warn(`Sending signal: /move/${message}`);
-    fetch('/move', {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({action: message})
-    })
-        .then(handleErrors)
-        .then(response => console.info("ok", response.text()))
-        .catch(error => console.error(error));
-}
-
 function triggerReward() {
     const currentMs = performance.now();
     if (currentMs > lastTriggered + SEQUENCE_DURATION) {
         lastTriggered = currentMs;
         console.warn('Successful triggering!  Starting lift, hold, close sequence.');
-        signal('OPEN_HOLD_CLOSE');
+        signal('open_hold_close');
     } else {
         console.debug("Skipping trigger, still acting on last.");
     }

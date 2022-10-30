@@ -1,5 +1,5 @@
-import * as POLY from "./polyfill.js";
-import {filterInPlace} from "./polyfill.js";
+import * as POLY from "./shared.js";
+import {filterInPlace} from "./shared.js";
 import {SpriteMap} from "./sprite-map.js";
 
 import * as CONFIG from "./config.js";
