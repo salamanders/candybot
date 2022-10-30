@@ -91,22 +91,22 @@ suspend fun doAction(action: String) {
                 return
             }
             isKidBusy = true
-            openLidMotor.rotate(360)
+            openLidMotor.rotate(-360 * 3)
             openLidMotor.hold()
             Delay.msDelay(8_000)
-            openLidMotor.rotate(-360)
+            openLidMotor.rotate(360 * 3)
             openLidMotor.stop()
             isKidBusy = false
         }
 
         "forward" -> {
             openLidMotor.rotate(180)
-            openLidMotor.stop()
+            openLidMotor.hold()
         }
 
         "backward" -> {
             openLidMotor.rotate(-180)
-            openLidMotor.stop()
+            openLidMotor.hold()
         }
 
         "float" -> {
@@ -122,7 +122,10 @@ suspend fun doAction(action: String) {
         }
 
         "wait" -> {
-            openLidMotor.stop()
+            openLidMotor.flt()
+            isKidBusy = true
+            Delay.msDelay(10_000)
+            isKidBusy = false
         }
 
         else -> System.err.println("UNKNOWN ACTION `${action}`")
