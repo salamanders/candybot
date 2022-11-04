@@ -1,7 +1,6 @@
 package info.benjaminhill.candybot
 
 import ev3dev.actuators.lego.motors.EV3LargeRegulatedMotor
-import io.ktor.network.tls.certificates.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -14,18 +13,11 @@ import io.ktor.server.routing.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import lejos.hardware.port.MotorPort
-import lejos.utility.Delay
-import java.io.File
 import java.net.NetworkInterface
-import java.security.KeyStore
 
-
-const val DUMMY_PASSWORD = "changeme"
-const val KEY_ALIAS = "ev3dev"
-val KEYSTORE_FILE = File("src/main/resources/keystore.jks")
-
-lateinit var openLidMotor: EV3LargeRegulatedMotor
-var isKidBusy = false
+lateinit var leftSpool: EV3LargeRegulatedMotor
+lateinit var rightSpool: EV3LargeRegulatedMotor
+const val rotationMultiplier = 3
 
 fun main() {
 
@@ -40,32 +32,12 @@ fun main() {
                 }
         }
 
-    if (!KEYSTORE_FILE.canRead()) {
-        generateCertificate(
-            file = KEYSTORE_FILE,
-            keyAlias = KEY_ALIAS,
-            keyPassword = DUMMY_PASSWORD,
-            jksPassword = DUMMY_PASSWORD
-        )
-        println("Generated ${KEYSTORE_FILE.absolutePath}")
-    }
-
-    val keystore = KeyStore.getInstance(KEYSTORE_FILE, DUMMY_PASSWORD.toCharArray())
-
     val environment = applicationEngineEnvironment {
         connector {
             port = 8080
         }
         developmentMode = true
         watchPaths = listOf("classes", "resources")
-        sslConnector(
-            keyStore = keystore,
-            keyAlias = KEY_ALIAS,
-            keyStorePassword = { DUMMY_PASSWORD.toCharArray() },
-            privateKeyPassword = { DUMMY_PASSWORD.toCharArray() }) {
-            port = 8443
-            keyStorePath = KEYSTORE_FILE
-        }
         module(Application::static)
         module(Application::controls)
     }
@@ -84,50 +56,36 @@ fun Application.static() {
     }
 }
 
-suspend fun doAction(action: String) {
+fun doAction(action: String) {
     when (action.lowercase()) {
-        "open_hold_close" -> {
-            if (isKidBusy) {
-                return
+        "forward_l" -> {
+            if (!leftSpool.isMoving) {
+                leftSpool.rotate(360 * rotationMultiplier)
+                leftSpool.hold()
             }
-            isKidBusy = true
-            openLidMotor.rotate(-360 * 3)
-            openLidMotor.hold()
-            Delay.msDelay(8_000)
-            openLidMotor.rotate(360 * 3)
-            openLidMotor.stop()
-            isKidBusy = false
         }
-
-        "forward" -> {
-            openLidMotor.rotate(180)
-            openLidMotor.hold()
+        "forward_r" -> {
+            if (!rightSpool.isMoving) {
+                rightSpool.rotate(360 * rotationMultiplier)
+                rightSpool.hold()
+            }
         }
-
-        "backward" -> {
-            openLidMotor.rotate(-180)
-            openLidMotor.hold()
+        "backward_l" -> {
+            if (!leftSpool.isMoving) {
+                leftSpool.rotate(-360 * rotationMultiplier)
+                leftSpool.hold()
+            }
         }
-
+        "backward_r" -> {
+            if (!rightSpool.isMoving) {
+                rightSpool.rotate(-360 * rotationMultiplier)
+                rightSpool.hold()
+            }
+        }
         "float" -> {
-            openLidMotor.flt()
+            leftSpool.flt()
+            rightSpool.flt()
         }
-
-        "stop" -> {
-            openLidMotor.stop()
-        }
-
-        "hold" -> {
-            openLidMotor.stop()
-        }
-
-        "wait" -> {
-            openLidMotor.flt()
-            isKidBusy = true
-            Delay.msDelay(10_000)
-            isKidBusy = false
-        }
-
         else -> System.err.println("UNKNOWN ACTION `${action}`")
     }
 }
@@ -143,9 +101,14 @@ fun Application.controls() {
     }
 
     try {
-        openLidMotor = EV3LargeRegulatedMotor(MotorPort.B)
+        leftSpool = EV3LargeRegulatedMotor(MotorPort.B).apply {
+            speed = maxSpeed.toInt()
+        }
+        rightSpool = EV3LargeRegulatedMotor(MotorPort.C).apply {
+            speed = maxSpeed.toInt()
+        }
     } catch (e: Exception) {
-        println("No real motor")
+        println("No real motor, $e")
     }
 
     routing {
@@ -158,7 +121,6 @@ fun Application.controls() {
                     "action" to moveRequest.action
                 )
             )
-            openLidMotor.speed = openLidMotor.maxSpeed.toInt()
             launch {
                 doAction(moveRequest.action)
             }
