@@ -12,19 +12,50 @@
     <style>
         body {
             background-color: black;
+            font-family: sans-serif;
+        }
+
+        table, tr, th, td {
+            font-family: sans-serif;
+            color: aqua;
+            font-size: xx-large;
         }
 
         button {
             margin: 1em;
             display: block;
-            font-size: 2em;
             font-family: sans-serif;
             font-weight: bold;
             user-select: none;
+            min-width: 5em;
+            border-radius: 0.3em;
         }
     </style>
     <script src="modules/remote.js" type="module"></script>
 </head>
 <body>
+
+<table>
+    <tr>
+        <th>Left</th>
+        <th>Right</th>
+    </tr>
+    <tr>
+        <td><button id="forward_l">Up</button></td>
+        <td><button id="forward_r">Up</button></td>
+    </tr>
+    <tr>
+        <td><button id="backward_l">Down</button></td>
+        <td><button id="backward_r">Down</button></td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <button id="float">Stop/Float</button>
+        </td>
+    </tr>
+</table>
+
+
+
 </body>
 </html>

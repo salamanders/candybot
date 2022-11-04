@@ -18,7 +18,7 @@ import java.net.NetworkInterface
 lateinit var leftSpool: EV3LargeRegulatedMotor
 lateinit var rightSpool: EV3LargeRegulatedMotor
 const val rotationMultiplier = 3
-
+lateinit var IPv4:String
 fun main() {
 
     println("Addresses")
@@ -29,6 +29,9 @@ fun main() {
             networkInterface.inetAddresses.asSequence()
                 .forEach { addr ->
                     println("  ${networkInterface.displayName} ${addr.hostAddress}")
+                    if(addr.hostAddress.startsWith("192")) {
+                        IPv4 = addr.hostAddress
+                    }
                 }
         }
 
@@ -42,6 +45,7 @@ fun main() {
         module(Application::controls)
     }
 
+    println("http://${IPv4}:8080")
     embeddedServer(Netty, environment).start(wait = true)
 }
 
