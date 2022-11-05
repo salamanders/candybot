@@ -24,7 +24,7 @@ val rightSpool: EV3LargeRegulatedMotor by lazy {
         speed = maxSpeed.toInt()
     }
 }
-const val rotationMultiplier = 2
+const val rotationMultiplier = .5
 fun main() {
 
     println("Addresses")
@@ -66,8 +66,8 @@ fun Application.static() {
 }
 
 fun rotateMotors(leftSpoolDir: Int, rightSpoolDir: Int) {
-    leftSpool.rotate(leftSpoolDir * 360 * rotationMultiplier, true)
-    rightSpool.rotate(rightSpoolDir * 360 * rotationMultiplier, true)
+    leftSpool.rotate((leftSpoolDir * 360 * rotationMultiplier).toInt(), true)
+    rightSpool.rotate((rightSpoolDir * 360 * rotationMultiplier).toInt(), true)
     leftSpool.waitComplete()
     rightSpool.waitComplete()
 }
