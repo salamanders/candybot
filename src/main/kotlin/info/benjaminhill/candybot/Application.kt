@@ -10,15 +10,21 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import lejos.hardware.port.MotorPort
 import java.net.NetworkInterface
 
-lateinit var leftSpool: EV3LargeRegulatedMotor
-lateinit var rightSpool: EV3LargeRegulatedMotor
-const val rotationMultiplier = 3
-lateinit var IPv4:String
+val leftSpool: EV3LargeRegulatedMotor by lazy {
+    EV3LargeRegulatedMotor(MotorPort.B).apply {
+        speed = maxSpeed.toInt()
+    }
+}
+val rightSpool: EV3LargeRegulatedMotor by lazy {
+    EV3LargeRegulatedMotor(MotorPort.C).apply {
+        speed = maxSpeed.toInt()
+    }
+}
+const val rotationMultiplier = 2
 fun main() {
 
     println("Addresses")
@@ -29,8 +35,8 @@ fun main() {
             networkInterface.inetAddresses.asSequence()
                 .forEach { addr ->
                     println("  ${networkInterface.displayName} ${addr.hostAddress}")
-                    if(addr.hostAddress.startsWith("192")) {
-                        IPv4 = addr.hostAddress
+                    if (addr.hostAddress.startsWith("192")) {
+                        println("http://${addr.hostAddress}:8080")
                     }
                 }
         }
@@ -45,7 +51,6 @@ fun main() {
         module(Application::controls)
     }
 
-    println("http://${IPv4}:8080")
     embeddedServer(Netty, environment).start(wait = true)
 }
 
@@ -60,36 +65,29 @@ fun Application.static() {
     }
 }
 
+fun rotateMotors(leftSpoolDir: Int, rightSpoolDir: Int) {
+    leftSpool.rotate(leftSpoolDir * 360 * rotationMultiplier, true)
+    rightSpool.rotate(rightSpoolDir * 360 * rotationMultiplier, true)
+    leftSpool.waitComplete()
+    rightSpool.waitComplete()
+}
+
 fun doAction(action: String) {
+    // positive is let out, negative is retract
     when (action.lowercase()) {
-        "forward_l" -> {
-            if (!leftSpool.isMoving) {
-                leftSpool.rotate(360 * rotationMultiplier)
-                leftSpool.hold()
-            }
-        }
-        "forward_r" -> {
-            if (!rightSpool.isMoving) {
-                rightSpool.rotate(360 * rotationMultiplier)
-                rightSpool.hold()
-            }
-        }
-        "backward_l" -> {
-            if (!leftSpool.isMoving) {
-                leftSpool.rotate(-360 * rotationMultiplier)
-                leftSpool.hold()
-            }
-        }
-        "backward_r" -> {
-            if (!rightSpool.isMoving) {
-                rightSpool.rotate(-360 * rotationMultiplier)
-                rightSpool.hold()
-            }
-        }
-        "float" -> {
+        "up_left" -> rotateMotors(-1, 0)
+        "up_middle" -> rotateMotors(-1, -1)
+        "up_right" -> rotateMotors(0, -1)
+        "center_left" -> rotateMotors(-1, 1)
+        "center_middle" -> {
             leftSpool.flt()
             rightSpool.flt()
         }
+
+        "center_right" -> rotateMotors(1, -1)
+        "down_left" -> rotateMotors(0, 1)
+        "down_middle" -> rotateMotors(1, 1)
+        "down_right" -> rotateMotors(1, 0)
         else -> System.err.println("UNKNOWN ACTION `${action}`")
     }
 }
@@ -104,30 +102,18 @@ fun Application.controls() {
         json()
     }
 
-    try {
-        leftSpool = EV3LargeRegulatedMotor(MotorPort.B).apply {
-            speed = maxSpeed.toInt()
-        }
-        rightSpool = EV3LargeRegulatedMotor(MotorPort.C).apply {
-            speed = maxSpeed.toInt()
-        }
-    } catch (e: Exception) {
-        println("No real motor, $e")
-    }
-
     routing {
         post("/motor") {
             val moveRequest = call.receive<ActionRequest>()
             println("/move $moveRequest")
+            doAction(moveRequest.action)
+            // Wait to respond intentionally
             call.respond(
                 mapOf(
                     "status" to "ack",
                     "action" to moveRequest.action
                 )
             )
-            launch {
-                doAction(moveRequest.action)
-            }
         }
     }
 }

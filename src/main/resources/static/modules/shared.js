@@ -34,14 +34,18 @@ function handleErrors(response) {
     return response;
 }
 
-export function signal(message) {
+/**
+ *
+ * @param message
+ * @return {Promise<Response | void>}
+ */
+export async function signal(message) {
     console.warn(`Sending signal: /motor/${message}`);
-    fetch('/motor', {
+    return fetch('/motor', {
         method: 'POST', headers: {
             'Accept': 'application/json', 'Content-Type': 'application/json'
         }, body: JSON.stringify({action: message})
     })
         .then(handleErrors)
-        .then(response => console.info('ok', response.text()))
         .catch(error => console.error(error));
 }

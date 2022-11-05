@@ -10,29 +10,32 @@
     <title>Big Draw</title>
     <link href="./css/reset.css" media="all" rel="stylesheet"/>
     <style>
-        body {
-            background-color: black;
-            font-family: sans-serif;
+
+        * {
+            font-family: monospace;
         }
 
-        table, tr, th, td {
-            font-family: sans-serif;
-            color: aqua;
-            font-size: xx-large;
+        body {
+            /*background-color: black;*/
         }
 
         button {
             margin: 1em;
-            display: block;
-            font-family: sans-serif;
+            /*display: block;*/
             font-weight: bold;
             user-select: none;
             min-width: 3em;
             border-radius: 0.3em;
+            font-size: xx-large;
         }
 
         #replay_seq {
-            bg-color: #224;
+            background-color: #999;
+            margin: 1em;
+            border-radius: 0.3em;
+            font-size: x-large;
+            font-weight: bold;
+            min-width: 6em;
         }
     </style>
     <script src="modules/remote.js" type="module"></script>
@@ -41,23 +44,41 @@
 
 <table>
     <tr>
-        <td><button id="up_left">↖</button></td>
-        <td><button id="up_middle">↑</button></td>
-        <td><button id="up_right">→</button></td>
+        <td>
+            <button id="up_left" class="navButton">↖</button>
+        </td>
+        <td>
+            <button id="up_middle" class="navButton">↑</button>
+        </td>
+        <td>
+            <button id="up_right" class="navButton">→</button>
+        </td>
     </tr>
     <tr>
-        <td><button id="center_left">←</button></td>
-        <td><button id="center_middle">🛑</button></td>
-        <td><button id="center_right">→</button></td>
+        <td>
+            <button id="center_left" class="navButton">←</button>
+        </td>
+        <td>
+            <button id="center_middle">🛑</button>
+        </td>
+        <td>
+            <button id="center_right" class="navButton">→</button>
+        </td>
     </tr>
     <tr>
-        <td><button id="down_left">↙</button></td>
-        <td><button id="down_middle">↓</button></td>
-        <td><button id="down_right">↘</button></td>
+        <td>
+            <button id="down_left" class="navButton">↙</button>
+        </td>
+        <td>
+            <button id="down_middle" class="navButton">↓</button>
+        </td>
+        <td>
+            <button id="down_right" class="navButton">↘</button>
+        </td>
     </tr>
 </table>
 
-<td><button id="replay">↻</button></td>
+<button id="replay">↻</button>
 
 <div id="replay_seq"></div>
 </body>
