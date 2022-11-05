@@ -27,8 +27,12 @@
             font-family: sans-serif;
             font-weight: bold;
             user-select: none;
-            min-width: 5em;
+            min-width: 3em;
             border-radius: 0.3em;
+        }
+
+        #replay_seq {
+            bg-color: #224;
         }
     </style>
     <script src="modules/remote.js" type="module"></script>
@@ -37,25 +41,24 @@
 
 <table>
     <tr>
-        <th>Left</th>
-        <th>Right</th>
+        <td><button id="up_left">↖</button></td>
+        <td><button id="up_middle">↑</button></td>
+        <td><button id="up_right">→</button></td>
     </tr>
     <tr>
-        <td><button id="forward_l">Up</button></td>
-        <td><button id="forward_r">Up</button></td>
+        <td><button id="center_left">←</button></td>
+        <td><button id="center_middle">🛑</button></td>
+        <td><button id="center_right">→</button></td>
     </tr>
     <tr>
-        <td><button id="backward_l">Down</button></td>
-        <td><button id="backward_r">Down</button></td>
-    </tr>
-    <tr>
-        <td colspan="2">
-            <button id="float">Stop/Float</button>
-        </td>
+        <td><button id="down_left">↙</button></td>
+        <td><button id="down_middle">↓</button></td>
+        <td><button id="down_right">↘</button></td>
     </tr>
 </table>
 
+<td><button id="replay">↻</button></td>
 
-
+<div id="replay_seq"></div>
 </body>
 </html>

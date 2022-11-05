@@ -1,7 +1,10 @@
-import {blockUntilDOMReady, signal} from "./shared.js";
+/* jshint esversion: 8 */
+/* jshint undef: true, unused: true */
+
+import {blockUntilDOMReady, signal} from './shared.js';
 
 await blockUntilDOMReady();
 
-['forward_l', 'forward_r', 'backward_l', 'backward_r', 'float'].forEach((buttonId) => {
-    document.getElementById(buttonId).onclick =  () => signal(buttonId);
-});
+Array.from(document.getElementsByTagName('button')).forEach(
+  button => button.onclick = () => signal(button.id)
+);
